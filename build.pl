@@ -39,7 +39,7 @@ sub main() {
 
     my $action = $opts{'a'} || 'build';
     if ($action eq 'build') {
-        my $jar = $Xposed::cfg->val('General', 'outdir') . '/java/XposedBridge.jar';
+        my $jar = $Xposed::cfg->val('General', 'outdir') . '/java/XppsedBridge.jar';
         if (!-r $jar) {
             print_error("$jar doesn't exist or isn't readable");
             exit 1;
@@ -66,7 +66,7 @@ sub main() {
             all_in_one($target->{'platform'}, $target->{'sdk'}, !$opts{'v'}) || exit 1;
         }
     } elsif ($action eq 'java') {
-        # Build XposedBridge.jar
+        # Build XppsedBridge.jar
         build_java() || exit 1;
     } elsif ($action eq 'prunelogs') {
         # Remove old logs
@@ -108,7 +108,7 @@ Format of <targets> is: <platform>:<sdk>[/<platform2>:<sdk2>/...]
 Values for <steps> are provided as a comma-separated list of:
   compile   Compile executables and libraries.
   collect   Collect compiled files and put them in the output directory.
-  prop      Create the xposed.prop file.
+  prop      Create the xppsed.prop file.
   zip       Create the flashable ZIP file.
   gpg       Sign the ZIP file with GPG (as configured).
 
@@ -178,7 +178,7 @@ sub compile($$;$) {
     if ($sdk < 21) {
         push @targets, qw/libxposed_dalvik/;
     } else {
-        push @targets, qw/libxposed_art/;
+        push @targets, qw/libxppsed_art/;
         push @targets, qw/libart libart-compiler libart-disassembler libsigchain/;
         push @targets, qw/dex2oat oatdump patchoat/;
         push @makefiles, qw(art/Android.mk);
@@ -259,7 +259,7 @@ sub get_compiled_files($$) {
     } else {
         $files{$_} = $_ foreach qw(
             /system/bin/app_process32_xposed
-            /system/lib/libxposed_art.so
+            /system/lib/libxppsed_art.so
 
             /system/lib/libart.so
             /system/lib/libart-compiler.so
@@ -277,7 +277,7 @@ sub get_compiled_files($$) {
 
             $files{$_} = $_ foreach qw(
                 /system/bin/app_process64_xposed
-                /system/lib64/libxposed_art.so
+                /system/lib64/libxppsed_art.so
 
                 /system/lib64/libart.so
                 /system/lib64/libart-disassembler.so
@@ -293,18 +293,18 @@ sub get_compiled_files($$) {
     return \%files;
 }
 
-# Creates the /system/xposed.prop file
+# Creates the /system/xppsed.prop file
 sub create_xposed_prop($$;$) {
     my $platform = shift;
     my $sdk = shift;
     my $print = shift || 0;
 
     should_perform_step('prop') || return 1;
-    print_status("Creating xposed.prop file...", 1);
+    print_status("Creating xppsed.prop file...", 1);
 
     # Open the file
     my $coldir = Xposed::get_collection_dir($platform, $sdk);
-    my $propfile = $coldir . '/files/system/xposed.prop';
+    my $propfile = $coldir . '/files/system/xppsed.prop';
     print "$propfile\n";
     make_path(dirname($propfile));
     if (!open(PROPFILE, '>', $propfile)) {
@@ -363,7 +363,7 @@ sub create_zip($$) {
     make_path($coldir);
     $zip->addTree($coldir . '/files/', '') == AZ_OK || return 0;
     $zip->addDirectory('system/framework/') || return 0;
-    $zip->addFile("$outdir/java/XposedBridge.jar", 'system/framework/XposedBridge.jar') || return 0;
+    $zip->addFile("$outdir/java/XppsedBridge.jar", 'system/framework/XppsedBridge.jar') || return 0;
     # TODO: We probably need different files for older releases
     $zip->addTree($Bin . '/zipstatic/_all/', '') == AZ_OK || return 0;
     $zip->addTree($Bin . '/zipstatic/' . $platform . '/', '') == AZ_OK || return 0;
@@ -436,7 +436,7 @@ sub gpg_sign($$) {
     return Xposed::gpg_sign($zippath);
 }
 
-# Build XposedBridge.jar
+# Build XppsedBridge.jar
 sub build_java() {
     print_status('Building the Java part...', 0);
     my $javadir = $Xposed::cfg->val('General', 'javadir');
@@ -450,12 +450,12 @@ sub build_java() {
     system('./gradlew app:assembleRelease lint') == 0 || return 0;
     print "\n";
 
-    print_status('Copying APK to XposedBridge.jar...', 1);
+    print_status('Copying APK to XppsedBridge.jar...', 1);
     my $base = $javadir . '/app/build/outputs/apk/app-release';
     foreach my $suffix ('.apk', '-unaligned.apk', '-unsigned.apk') {
         my $file = $base . $suffix;
         if (-f $file) {
-            my $target = $Xposed::cfg->val('General', 'outdir') . '/java/XposedBridge.jar';
+            my $target = $Xposed::cfg->val('General', 'outdir') . '/java/XppsedBridge.jar';
             print "$file => $target\n";
             make_path(dirname($target));
             if (!copy($file, $target)) {

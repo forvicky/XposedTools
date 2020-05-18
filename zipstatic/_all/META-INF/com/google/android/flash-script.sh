@@ -97,8 +97,8 @@ echo "******************************"
 echo "Xposed framework installer zip"
 echo "******************************"
 
-if [ ! -f "system/xposed.prop" ]; then
-  echo "! Failed: Extracted file system/xposed.prop not found!"
+if [ ! -f "system/xppsed.prop" ]; then
+  echo "! Failed: Extracted file system/xppsed.prop not found!"
   exit 1
 fi
 
@@ -119,10 +119,10 @@ ABI=$(grep_prop ro.product.cpu.abi | cut -c-3)
 ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
 ABILONG=$(grep_prop ro.product.cpu.abi)
 
-XVERSION=$(grep_prop version system/xposed.prop)
-XARCH=$(grep_prop arch system/xposed.prop)
-XMINSDK=$(grep_prop minsdk system/xposed.prop)
-XMAXSDK=$(grep_prop maxsdk system/xposed.prop)
+XVERSION=$(grep_prop version system/xppsed.prop)
+XARCH=$(grep_prop arch system/xppsed.prop)
+XMINSDK=$(grep_prop minsdk system/xppsed.prop)
+XMAXSDK=$(grep_prop maxsdk system/xppsed.prop)
 
 XEXPECTEDSDK=$(android_version $XMINSDK)
 if [ "$XMINSDK" != "$XMAXSDK" ]; then
@@ -167,8 +167,8 @@ if [ -z $XVALID ]; then
 fi
 
 echo "- Placing files"
-install_nobackup /system/xposed.prop                      0    0 0644
-install_nobackup /system/framework/XposedBridge.jar       0    0 0644
+install_nobackup /system/xppsed.prop                      0    0 0644
+install_nobackup /system/framework/XppsedBridge.jar       0    0 0644
 
 install_and_link  /system/bin/app_process32               0 2000 0755 u:object_r:zygote_exec:s0
 install_overwrite /system/bin/dex2oat                     0 2000 0755 u:object_r:dex2oat_exec:s0
@@ -178,14 +178,14 @@ install_overwrite /system/lib/libart.so                   0    0 0644
 install_overwrite /system/lib/libart-compiler.so          0    0 0644
 install_overwrite /system/lib/libart-disassembler.so      0    0 0644
 install_overwrite /system/lib/libsigchain.so              0    0 0644
-install_nobackup  /system/lib/libxposed_art.so            0    0 0644
+install_nobackup  /system/lib/libxppsed_art.so            0    0 0644
 if [ $IS64BIT ]; then
   install_and_link  /system/bin/app_process64             0 2000 0755 u:object_r:zygote_exec:s0
   install_overwrite /system/lib64/libart.so               0    0 0644
   install_overwrite /system/lib64/libart-compiler.so      0    0 0644
   install_overwrite /system/lib64/libart-disassembler.so  0    0 0644
   install_overwrite /system/lib64/libsigchain.so          0    0 0644
-  install_nobackup  /system/lib64/libxposed_art.so        0    0 0644
+  install_nobackup  /system/lib64/libxppsed_art.so        0    0 0644
 fi
 
 if [ "$API" -ge "22" ]; then
